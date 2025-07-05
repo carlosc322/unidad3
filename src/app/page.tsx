@@ -1,62 +1,76 @@
 'use client'
 
 import { useState, useEffect } from "react"
+import { Datos } from "./interfaces/IPersonas"
 
-const Datos = {// nombreG-Datos nombreG-name tienen que ser iguales//
+const datosIniciales: Datos = {// nombreG-Datos nombreG-name tienen que ser iguales//
   nombreG: "",
-  idG: "",
-  fechaG: "",
+  idG:0,
+  fechaG: new Date(),
   descripcionG: "",
   turnoG: ""
 }
-
 export default function Home() {
   console.log("esto es home")
-  const[lista, setLista] = useState(Datos)
-  console.log(lista ,"se imprime en vivo")
+  const[datosIngr, setDatosIngr] = useState(datosIniciales)//lista dato
+  const[datosLocalS, setDatosLocalS] = useState<Datos[]>([])
+  console.log(datosIngr ,"se imprime en vivo")
 
-
+//primero recupera los datos del local storage y 
+//y luego nunca mas se vuelve a ejecutar useEffect 
 
   useEffect(()=>{
-    const localS = window.localStorage
-    localS.setItem("datos",JSON.stringify(lista))
-  })
-  
+    console.log("solo se ejcuta una vez")
+    let datosStr = window.localStorage.getItem("datosE")
+    if (datosStr!= null){
+      let datosObj = JSON.parse(datosStr)
+      setDatosLocalS(datosObj)
+    }
+  },[]);
 
-  const agregarDatos = (name:string,value:string)=>{ //TypeScript//
-    console.log("esto es agregarD")
+
+
+
+  const registrarDatos = ()=>{
+    const nuevoAgr = [...datosLocalS,datosIngr]
+    localStorage.setItem("datosE",JSON.stringify(nuevoAgr))
+    setDatosLocalS(nuevoAgr)
+  };
+
+  const agregarDatos = (name:string,value:string | number)=>{ //TypeScript//
+    console.log("esto es agregar")
     console.log(name,value)
-    setLista({...lista, [name] : value})
+    setDatosIngr({...datosIngr, [name] : value})
   };
 
 
 
 
     return (
-    <>
-      <h1>Control Laboral</h1>
-
-      <h1>{lista.nombreG}</h1>
+    <> 
+      <h1>Ingreso Laboral</h1>
+      <h1>{datosIngr.nombreG}</h1>
     <form>
       <label>Grupo de Trabajo : </label>
-      <input type="text" name="nombreG" placeholder="Ingresa el nombre.." 
+      <input type="text" name="nombreG" placeholder="Ingresa el nombre.." value={datosIngr.nombreG}
       onChange = {(e) => {agregarDatos(e.target.name, e.target.value)}}
       /><br />
-
       <label>ID del Grupo : </label>
-      <input type="number" name="id" placeholder="Ingresa el id.."/><br />
+      <input type="number" name="idG" placeholder="Ingresa el id.."
+      /><br />
       <label>Fecha : </label>
-      <input type="date" name="fecha" placeholder="Ingrese fecha de laburo.." /><br />
+      <input type="date" name="fechaG" placeholder="Ingrese fecha de laburo.." /><br />
       <label>Descripción. </label><br />
-      <textarea name="Descripcion" placeholder="Descripcion del trabajo.."></textarea><br />
+      <textarea name="descripcionG" placeholder="Descripcion del trabajo.."></textarea><br />
       <label>Turno : </label>
-      <select>
+      <select name="turnoG">
+        <option value="">Seleccionar turno</option>
         <option value="dia">Dia</option>
         <option value="noche">Noche</option>
       </select>
-
-    </form>
+    </form><br />
+    <span></span>
+    <button onClick={()=>{registrarDatos()}}>Registrar</button>
     </>
-
   )
 }
