@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Datos } from "./interfaces/IPersonas";
-import MostrarDatos from "./MostrarPersonas";
+import MostrarDatos from "./MostrarDatos";
 
 const datosIniciales: Datos = {// nombreG-Datos nombreG-name tienen que ser iguales//
   nombreG: "",
@@ -30,9 +30,6 @@ export default function Home() {
     }
   },[]);
 
-
-
-
   const registrarDatos = ()=>{
     const nuevoAgr = [...datosLocalS,datosIngr]
     localStorage.setItem("datosE",JSON.stringify(nuevoAgr))
@@ -46,8 +43,9 @@ export default function Home() {
   };
 
   const datosRecib =(d:Datos)=>{
-    setDatosA(d)  //me dio otr error
+    setDatosA(d) //me dio otr error
   }
+  //const eliminarD = (id: number) => {
 
     return (
     <> 
@@ -62,8 +60,8 @@ export default function Home() {
       <input type="number" name="idG" placeholder="Ingresa el id.."
       onChange = {(e) => {agregarDatos(e.target.name, e.target.value)}}
       /><br />
-      <label>Fecha : </label>
-      <input type="date" name="fechaG" placeholder="Ingrese fecha de laburo.." 
+      <label>Fecha de ingreso : </label>
+      <input type="date" name="fechaG"  
       onChange = {(e) => {agregarDatos(e.target.name, e.target.value)}}
       /><br />
       <label>Descripción. </label><br />
@@ -76,10 +74,50 @@ export default function Home() {
         <option value="">Seleccionar turno</option>
         <option value="Dia">Dia</option>
         <option value="Noche">Noche</option>
-      </select>
+      </select><br />
+      <button onClick={()=>{registrarDatos()}}>Registrar</button>
     </form>
-    <button onClick={()=>{registrarDatos()}}>Registrar</button>
+
     <MostrarDatos datosP = {datosRecib}/>
+
+    <form>
+      <h1>ACTUALIZAR DATOS</h1>
+      <label>Nombre : </label>
+      <input 
+      type="text" 
+      name="nombreG" 
+      placeholder="Nuevo nombre.." 
+      value={datosA.nombreG}
+      onChange = {(e) => {agregarDatos(e.target.name, e.target.value)}}/><br/>
+      <label>ID : </label>
+      <input 
+      type="number" 
+      name="idG" 
+      placeholder="Nuevo id.." 
+      value={datosA.idG}
+      onChange = {(e) => {agregarDatos(e.target.name, e.target.value)}}/><br/>
+      <label>Fecha : </label>
+      <input 
+      type="date" 
+      name="fechaG" 
+      value={new Date(datosA.fechaG).toLocaleDateString()}
+      onChange = {(e) => {agregarDatos(e.target.name, e.target.value)}}/><br/>
+      <label>Descripción : </label><br />
+      <input 
+      type="text" 
+      name="descripcionG" 
+      placeholder="Descripción.."
+      value = {datosA.descripcionG}
+      onChange = {(e) => {agregarDatos(e.target.name, e.target.value)}}/><br/>
+      <label>Turno : </label>
+      <select name="turnoG"
+      onChange = {(e) => {agregarDatos(e.target.name, e.target.value)}}>
+        <option value=""></option>
+        <option value={datosA.turnoG}>Dia</option>
+        <option value={datosA.turnoG}>Noche</option>
+      </select>
+      <button>Actualizar</button>
+    </form>
     </>
   )
 }

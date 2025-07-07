@@ -6,22 +6,30 @@ interface Props{//me marco un error
 }
 
 export const MostrarDatos =(props: Props) => {
-        const localStor = window.localStorage
-        const[datos, setDatos] = useState<Datos[]>([])
-            useEffect(()=>{
-                let listaD = localStor.getItem("datosE")
-                if (listaD != null){
-                    let listaObj = JSON.parse(listaD)
-                    setDatos(listaObj)
-                }
-        },[])
-        const editarD = (index:number)=>{
-            alert("Le diste al "+index)
-            props.datosP(datos[index])
+
+    const[datos, setDatos] = useState<Datos[]>([])
+    useEffect(()=>{
+        let listaD = window.localStorage.getItem("datosE")
+        if (listaD != null){
+            let listaObj = JSON.parse(listaD)
+            setDatos(listaObj)
         }
+    },[])
+    const editarD = (index:number)=>{
+        props.datosP(datos[index])
+    };
+
+    const eliminarD = (indice:number)=>{
+        const datosO =  JSON.parse(localStorage.getItem('datosE') || '[]' );
+        const datosFil = datosO.filter((datos: any,index: number)=>index != indice)//no se sabe el dato
+        localStorage.setItem('datosE', JSON.stringify(datosFil))
+        setDatos(datosFil)
+        //if(datosFil == null)
+
+    };
+
     return (
         <>
-        <h1>{}</h1>
         <table>
             <thead>
                 <tr>
@@ -38,13 +46,13 @@ export const MostrarDatos =(props: Props) => {
                         <tr key={index}>
                             <td>{d.nombreG}</td>
                             <td>{d.idG}</td>
-                            <td></td>
+                            <td>{new Date(d.fechaG).toLocaleDateString()}</td>
                             <td>{d.descripcionG}</td>
                             <td>{d.turnoG}</td>
                             <td>
                                 <button onClick ={()=>editarD(index)}>Editar</button>
+                                <button onClick ={()=>eliminarD(index)}>Eliminar</button>
                             </td>
-                            <td><button>Eliminar</button></td>
                         </tr>
                     )
                 })}
