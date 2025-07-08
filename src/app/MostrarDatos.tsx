@@ -2,12 +2,13 @@ import React,{ useEffect, useState } from "react";
 import { Datos } from "./interfaces/IPersonas";
 
 interface Props{//me marco un error
-    datosP: (d: Datos)=> void;
+    datosP: (d: Datos, index:number)=> void;
+    setDatosLocalS: (a:[])=>void;
 }
 
 export const MostrarDatos =(props: Props) => {
-
     const[datos, setDatos] = useState<Datos[]>([])
+
     useEffect(()=>{
         let listaD = window.localStorage.getItem("datosE")
         if (listaD != null){
@@ -16,14 +17,15 @@ export const MostrarDatos =(props: Props) => {
         }
     },[])
     const editarD = (index:number)=>{
-        props.datosP(datos[index])
+        props.datosP(datos[index],index)
     };
 
     const eliminarD = (indice:number)=>{
         const datosO =  JSON.parse(localStorage.getItem('datosE') || '[]' );
-        const datosFil = datosO.filter((datos: any,index: number)=>index != indice)//no se sabe el dato
+        const datosFil = datosO.filter((datosc:any,index: number)=>index != indice)//no se sabe el dato
         localStorage.setItem('datosE', JSON.stringify(datosFil))
         setDatos(datosFil)
+        props.setDatosLocalS(datosFil) //esto lo hice y
         //if(datosFil == null)
 
     };

@@ -16,7 +16,8 @@ export default function Home() {
   const[datosIngr, setDatosIngr] = useState(datosIniciales)//lista dato
   const[datosLocalS, setDatosLocalS] = useState<Datos[]>([])
   const[datosA, setDatosA] = useState(datosIniciales)
-  console.log(datosIngr ,"se imprime en vivo")
+  const[indiceA,setIndice]= useState(0)
+  const[datosAct, setDatosAct]=useState(datosIniciales)
 
 //primero recupera los datos del local storage y 
 //y luego nunca mas se vuelve a ejecutar useEffect 
@@ -34,22 +35,42 @@ export default function Home() {
     const nuevoAgr = [...datosLocalS,datosIngr]
     localStorage.setItem("datosE",JSON.stringify(nuevoAgr))
     setDatosLocalS(nuevoAgr)
+    setDatosIngr(datosIniciales)
   };
 
-  const agregarDatos = (name:string,value:string | number)=>{ //TypeScript//
-    console.log("esto es agregar")
-    console.log(name,value)
+  const agregarDatos = (name:string,value:string | number)=>{ 
     setDatosIngr({...datosIngr, [name] : value})
   };
 
-  const datosRecib =(d:Datos)=>{
-    setDatosA(d) //me dio otr error
-  }
-  //const eliminarD = (id: number) => {
+  const datosRecib =(d:Datos,indiceE:number)=>{
+    setDatosA(d)
+    setIndice(indiceE)
+  };
 
+  const datosAC = (name:string,value:string | number)=>{ 
+    console.log("esto es actualizar")
+    console.log(name,value)
+    setDatosAct({...datosAct, [name] : value})
+  };
+
+  const actualizarDatos =()=>{
+    if(indiceA != null){
+      const nuevaListA = [...datosLocalS]
+      nuevaListA[indiceA] ={
+      nombreG: datosAct.nombreG,
+      idG: datosAct.idG,
+      fechaG: datosAct.fechaG,
+      descripcionG: datosAct.descripcionG,
+      turnoG: datosAct.turnoG
+    }
+    setDatosLocalS(nuevaListA)
+    localStorage.setItem("datosE",JSON.stringify(nuevaListA))
+    }
+
+  }
     return (
     <> 
-      <h1>Ingreso Laboral</h1>
+      <h1>CONTROL DEL INGRESO LABORAL</h1>
       <h1>{datosIngr.nombreG}</h1>
     <form>
       <label>Grupo de Trabajo : </label>
@@ -76,9 +97,11 @@ export default function Home() {
         <option value="Noche">Noche</option>
       </select><br />
       <button onClick={()=>{registrarDatos()}}>Registrar</button>
+      
     </form>
+    
 
-    <MostrarDatos datosP = {datosRecib}/>
+    <MostrarDatos datosP = {datosRecib} setDatosLocalS = {setDatosLocalS}/>
 
     <form>
       <h1>ACTUALIZAR DATOS</h1>
@@ -86,37 +109,36 @@ export default function Home() {
       <input 
       type="text" 
       name="nombreG" 
-      placeholder="Nuevo nombre.." 
-      value={datosA.nombreG}
-      onChange = {(e) => {agregarDatos(e.target.name, e.target.value)}}/><br/>
+      placeholder={datosA.nombreG}
+      onChange = {(e) => {datosAC(e.target.name, e.target.value)}}/><br/>
       <label>ID : </label>
       <input 
       type="number" 
       name="idG" 
-      placeholder="Nuevo id.." 
-      value={datosA.idG}
-      onChange = {(e) => {agregarDatos(e.target.name, e.target.value)}}/><br/>
+      placeholder={String(datosA.idG)}
+      onChange = {(e) => {datosAC(e.target.name, e.target.value)}}/><br/>
       <label>Fecha : </label>
       <input 
       type="date" 
       name="fechaG" 
-      value={new Date(datosA.fechaG).toLocaleDateString()}
-      onChange = {(e) => {agregarDatos(e.target.name, e.target.value)}}/><br/>
+      placeholder={new Date(datosA.fechaG).toLocaleDateString()}
+      onChange = {(e) => {datosAC(e.target.name, e.target.value)}}/><br/>
       <label>Descripción : </label><br />
       <input 
       type="text" 
       name="descripcionG" 
-      placeholder="Descripción.."
-      value = {datosA.descripcionG}
-      onChange = {(e) => {agregarDatos(e.target.name, e.target.value)}}/><br/>
+      placeholder={datosA.descripcionG}
+      onChange = {(e) => {datosAC(e.target.name, e.target.value)}}/><br/>
       <label>Turno : </label>
       <select name="turnoG"
-      onChange = {(e) => {agregarDatos(e.target.name, e.target.value)}}>
+      onChange = {(e) => {datosAC(e.target.name, e.target.value)}}>
         <option value=""></option>
-        <option value={datosA.turnoG}>Dia</option>
-        <option value={datosA.turnoG}>Noche</option>
-      </select>
-      <button>Actualizar</button>
+        <option value="Dia">Dia</option>
+        <option value="Noche">Noche</option>
+      </select><br />
+      <button
+      onClick={actualizarDatos}
+      >Actualizar</button>
     </form>
     </>
   )
