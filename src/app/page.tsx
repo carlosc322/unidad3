@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Datos } from "./interfaces/IPersonas";
 import MostrarDatos from "./MostrarDatos";
 
-const datosIniciales: Datos = {// nombreG-Datos nombreG-name tienen que ser iguales//
+const datosIniciales: Datos = {
   nombreG: "",
   idG: 0,
   fechaG: new Date(),
