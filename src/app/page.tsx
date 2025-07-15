@@ -5,10 +5,12 @@ import { Datos } from "./interfaces/IPersonas";
 import MostrarDatos from "./MostrarDatos";
 import { collection, addDoc, getDocs } from "firebase/firestore";
 import {db} from "../conexion/firebase";
-import { error } from "console";
+import {datosR} from "./funUseEff";
+
 
 
 const datosIniciales: Datos = {
+  id: "",
   nombreG: "",
   idG: 0,
   fechaG: new Date(),
@@ -26,15 +28,15 @@ export default function Home() {
 
 //primero recupera los datos del local storage y 
 //y luego nunca mas se vuelve a ejecutar useEffect
-
   useEffect(()=>{
-    console.log("solo se ejcuta una vez")
-    let datosStr = window.localStorage.getItem("datosE")
-    if (datosStr!= null){
-      let datosObj = JSON.parse(datosStr)
-      setDatosLocalS(datosObj)
+    const traerD = async ()=>{
+      const registrarD = await datosR()
+      setDatosLocalS(registrarD)
+      console.log(registrarD," esto es de use effect")
     }
+    traerD();
   },[]);
+
 
   const registrarDatos = async()=>{
     try {

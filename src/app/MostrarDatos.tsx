@@ -1,5 +1,6 @@
 import React,{ useEffect, useState } from "react";
 import { Datos } from "./interfaces/IPersonas";
+import {datosR} from "./funUseEff"
 
 interface Props{//me marco un error
     datosP: (d: Datos, index:number)=> void;
@@ -10,12 +11,13 @@ export const MostrarDatos =(props: Props) => {
     const[datos, setDatos] = useState<Datos[]>([])
 
     useEffect(()=>{
-        let listaD = window.localStorage.getItem("datosE")
-        if (listaD != null){
-            let listaObj = JSON.parse(listaD)
-            setDatos(listaObj)
+        const datosRec = async ()=>{
+            const listaOj = await datosR() //sin wait guardamos una promesa pendiente
+            setDatos(listaOj)
         }
+        datosRec()
     },[])
+
     const editarD = (index:number)=>{
         props.datosP(datos[index],index)
     };
@@ -64,3 +66,12 @@ export const MostrarDatos =(props: Props) => {
     )
 }
 export default MostrarDatos
+
+//wait
+//📦 Analogía rápida:
+//Imagina que datosR() es como pedir comida a domicilio:
+//Tú haces: const listaOj = datosR();
+//Pero datosR() es un pedido que todavía está en camino (una promesa).
+//Así que listaOj es la caja vacía con un cartel que dice "en camino", no la comida.
+//Si quieres la comida real, tienes que esperar a que llegue.
+//→ Eso es lo que hace await.
