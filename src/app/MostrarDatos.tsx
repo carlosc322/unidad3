@@ -1,14 +1,17 @@
 import React,{ useEffect, useState } from "react";
 import { Datos } from "./interfaces/IPersonas";
 import {datosR} from "./funUseEff"
+import { deleteDoc, doc } from "firebase/firestore";
+import { db } from "@/conexion/firebase";
 
 interface Props{//me marco un error
     datosP: (d: Datos, index:number)=> void;
-    setDatosLocalS: (a:[])=>void;
+    setDatosLocalS: (a:Datos[])=>void;
 }
 
 export const MostrarDatos =(props: Props) => {
     const[datos, setDatos] = useState<Datos[]>([])
+    console.log("esto mostrara datos", datos)
 
     useEffect(()=>{
         const datosRec = async ()=>{
@@ -18,19 +21,22 @@ export const MostrarDatos =(props: Props) => {
         datosRec()
     },[])
 
-    const editarD = (index:number)=>{
-        props.datosP(datos[index],index)
-    };
-
-    const eliminarD = (indice:number)=>{
-        const datosO =  JSON.parse(localStorage.getItem('datosE') || '[]' );
-        const datosFil = datosO.filter((datosc:any,index: number)=>index != indice)//no se sabe el dato
-        localStorage.setItem('datosE', JSON.stringify(datosFil))
-        setDatos(datosFil)
-        props.setDatosLocalS(datosFil) //esto lo hice y
-        //if(datosFil == null)
+    const editarD = (index:string)=>{
 
     };
+
+const eliminarD = async (indice: string) => {
+    try {
+        const noElim = datos.filter((o) => o.id !== indice);
+        await deleteDoc(doc(db, "Registros", indice));
+        setDatos(noElim);
+        props.setDatosLocalS(noElim)
+    } catch (error) {
+        console.error("Error al eliminar el documento:", error);
+        alert("Ocurrió un error al eliminar el registro.");
+    }
+};
+
 
     return (
         <>
@@ -53,13 +59,12 @@ export const MostrarDatos =(props: Props) => {
                             <td>{new Date(d.fechaG).toLocaleDateString()}</td>
                             <td>{d.descripcionG}</td>
                             <td>{d.turnoG}</td>
-                            <td>
-                                <button onClick ={()=>editarD(index)}>Editar</button>
-                                <button onClick ={()=>eliminarD(index)}>Eliminar</button>
-                            </td>
-                        </tr>
-                    )
-                })}
+                        <td>
+                            <button onClick ={()=>editarD(d.id!)}>Editar</button>
+                            <button onClick ={()=>eliminarD(d.id!)}>Eliminar</button>
+                        </td>
+                    </tr>
+                    )})}
             </tbody>
         </table>          
         </>      
@@ -67,6 +72,10 @@ export const MostrarDatos =(props: Props) => {
 }
 export default MostrarDatos
 
+
+
+
+//el `!` le dice a TypeScript: "Confía en mí, esto no es undefined"
 //wait
 //📦 Analogía rápida:
 //Imagina que datosR() es como pedir comida a domicilio:

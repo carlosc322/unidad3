@@ -1,20 +1,21 @@
 
 import { collection, getDocs } from "firebase/firestore";
 import {db} from "../conexion/firebase";
+import { Datos } from "./interfaces/IPersonas";
+
 
 export async function datosR() {
-    const qdatos = await getDocs(collection(db,"Registros"));
-    console.log("esto es datos RE--" ,qdatos)
-    const datosO = qdatos.docs.map(datO =>{//datO es una instancia de QueryDocumentSnapshot__id_data->Foreach
-    const datRec = datO.data();//funcioa que devuelve los datos reales
-        return{
-            id: datO.id,
-            nombreG: datRec.nombreG ?? '',
-            idG: datRec.idG ?? '',
-            fechaG: datRec.fechaG?.toDate?.() ?? new Date(),
-            descripcionG: datRec.descripcionG ?? '',
-            turnoG: datRec.turnoG ?? ''
-        }
-    })
-    return datosO
+    const qdatos = await getDocs(collection(db, "Registros"));
+
+    const datosO = qdatos.docs.map((doc) => ({
+        id: doc.id,
+        nombreG: doc.data().nombreG,
+        idG: doc.data().idG,
+        fechaG: doc.data().fechaG?.toDate?.() ?? new Date(),
+        descripcionG: doc.data().descripcionG,
+        turnoG: doc.data().turnoG,
+    }));
+return datosO;
 };
+
+// export async function datosR() {
