@@ -4,38 +4,45 @@ import {datosR} from "./funUseEff"
 import { deleteDoc, doc } from "firebase/firestore";
 import { db } from "@/conexion/firebase";
 
-interface Props{//me marco un error
-    datosP: (d: Datos, index:number)=> void;
-    setDatosLocalS: (a:Datos[])=>void;
-}
 
-export const MostrarDatos =(props: Props) => {
+interface Props{//me marco un error
+    datosP: (d: string)=> void; //era de tipo Datos[]
+    setDatosLocalS: (a:Datos[])=>void;
+    idesAlm: string;
+};
+
+export const MostrarDatos =(props:Props) => {
     const[datos, setDatos] = useState<Datos[]>([])
+
     console.log("esto mostrara datos", datos)
 
     useEffect(()=>{
         const datosRec = async ()=>{
             const listaOj = await datosR() //sin wait guardamos una promesa pendiente
             setDatos(listaOj)
+        };
+        if(props.idesAlm){
+            datosRec()
+        }else{
+            alert("Id no encontrada")
         }
-        datosRec()
-    },[])
+    },[props.idesAlm]);
 
-    const editarD = (index:string)=>{
-
+    const editarD =(index:string)=>{
+        //alert("esto es lo que se va a enviar"+ index)
+        props.datosP(index)
     };
 
-const eliminarD = async (indice: string) => {
-    try {
-        const noElim = datos.filter((o) => o.id !== indice);
-        await deleteDoc(doc(db, "Registros", indice));
-        setDatos(noElim);
-        props.setDatosLocalS(noElim)
-    } catch (error) {
-        console.error("Error al eliminar el documento:", error);
-        alert("Ocurrió un error al eliminar el registro.");
-    }
-};
+    const eliminarD = async (indice: string) => {
+        try {
+            const noElim = datos.filter((o) => o.id != indice);
+            await deleteDoc(doc(db, "Registros", indice));
+            setDatos(noElim);
+        } catch (error) {
+            console.error("Error al eliminar el documento:", error);
+            //alert("Ocurrió un error al eliminar el registro.");
+        }
+    };
 
 
     return (
@@ -51,12 +58,12 @@ const eliminarD = async (indice: string) => {
                 </tr>
             </thead>
             <tbody>
-                {datos.map((d,index)=>{
+                {datos.map((d)=>{
                     return(
-                        <tr key={index}>
+                        <tr key={d.id}>
                             <td>{d.nombreG}</td>
                             <td>{d.idG}</td>
-                            <td>{new Date(d.fechaG).toLocaleDateString()}</td>
+                            <td>{d.fechaG.toISOString().substring(0, 10)}</td>
                             <td>{d.descripcionG}</td>
                             <td>{d.turnoG}</td>
                         <td>
@@ -69,6 +76,7 @@ const eliminarD = async (indice: string) => {
         </table>          
         </>      
     )
+    
 }
 export default MostrarDatos
 
