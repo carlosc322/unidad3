@@ -67,7 +67,6 @@ export default function Home() {
   };
 
   const datosRecib =(d:string)=>{
-    try{
       const traerD = async ()=>{
       const registrarA = await datosR()
       const dFiltrados = registrarA.filter((a)=>a.id == d);
@@ -80,13 +79,11 @@ export default function Home() {
             turnoG: d.turnoG
         }
         setDatosA(datoACT)
+        console.log(datoACT+" este es el datosACT para actualizar")
       })
-      }
-      traerD()
-      setIda(d)  // es el id que recibimos
-    } catch (e){
-      console.log("Error al guardar los datos a Actualizar: "+ e)
     }
+    traerD()
+    setIda(d)  // es el id que recibimos
   };
 
   const datosAC = (name:string,value:string | number | Date)=>{ 
@@ -96,23 +93,19 @@ export default function Home() {
   };
 
   const actualizarDatos = ()=>{
-    try {
-      const docRef = doc(db, 'Registros',iDA);
-      alert("la IDA es "+ iDA)
-      const act = async () => {
+    const docRef = doc(db, 'Registros',iDA);
+    alert("la IDA es "+ iDA)
+    const act = async () => {
       await updateDoc(docRef, {
         nombreG: datosAct.nombreG,
         idG: datosAct.idG,
-        fechaG: datosAct.fechaG,
+        fechaG: Timestamp.fromDate(new Date(datosAct.fechaG)),
         descripcionG: datosAct.descripcionG,
         turnoG: datosAct.turnoG,
       });
     }
     act()
     setIdes(iDA)
-    } catch (e) {
-      console.log("Error al aSctualizar los datos: "+ e)
-    }
   };
 
 
@@ -154,6 +147,7 @@ export default function Home() {
     </form>
     <MostrarDatos  datosP={datosRecib} setDatosLocalS={setDatosLocalS} idesAlm = {idds} />
 
+
     <form>
       <h1>ACTUALIZAR DATOS</h1>
       <label>Nombre : </label>
@@ -172,6 +166,7 @@ export default function Home() {
       <input 
       type="date" 
       name="fechaG" 
+      placeholder={new Date(datosA.fechaG).toLocaleDateString().substring(0, 10)}
       onChange = {(e) => {datosAC(e.target.name, e.target.value)}}/><br/>
       <label>Descripción : </label><br />
       <input 
