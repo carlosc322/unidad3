@@ -5,7 +5,6 @@ import {db} from "../conexion/firebase";
 
 export async function datosR() {
     const qdatos = await getDocs(collection(db, "Registros"));
-
     const datosO = qdatos.docs.map((doc) => ({
         id: doc.id,
         nombreG: doc.data().nombreG,

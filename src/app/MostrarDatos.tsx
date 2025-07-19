@@ -39,11 +39,10 @@ export const MostrarDatos =(props:Props) => {
             await deleteDoc(doc(db, "Registros", indice));
             setDatos(noElim);
         } catch (error) {
-            console.error("Error al eliminar el documento:", error);
+            console.log("Error al eliminar el documento: "+ error);
             //alert("Ocurrió un error al eliminar el registro.");
         }
     };
-
 
     return (
         <>
@@ -63,7 +62,7 @@ export const MostrarDatos =(props:Props) => {
                         <tr key={d.id}>
                             <td>{d.nombreG}</td>
                             <td>{d.idG}</td>
-                            <td>{d.fechaG.toISOString().substring(0, 10)}</td>
+                            <td>{d.fechaG.toLocaleDateString()}</td>
                             <td>{d.descripcionG}</td>
                             <td>{d.turnoG}</td>
                         <td>

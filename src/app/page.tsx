@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Datos } from "./interfaces/IPersonas";
 import MostrarDatos from "./MostrarDatos";
-import { collection, addDoc} from "firebase/firestore";
+import { collection, addDoc, Timestamp} from "firebase/firestore";
 import { updateDoc , doc } from "firebase/firestore";
 import {db} from "../conexion/firebase";
 import {datosR} from "./funUseEff";
@@ -12,7 +12,7 @@ import {datosR} from "./funUseEff";
 const datosIniciales: Datos = {
   nombreG: "",
   idG: 0,
-  fechaG: new Date,
+  fechaG: new Date(),
   descripcionG: "",
   turnoG: ""
 }
@@ -40,23 +40,34 @@ export default function Home() {
   },[]);
 
   const registrarDatos = async()=>{
+    try{
       console.log("datos a guardar ", datosIngr)
-      const docuRf = await addDoc(collection(db, "Registros"),datosIngr) //Inicializamos las entradas...
+      const docuRf = await addDoc(collection(db, "Registros"),{
+        nombreG: datosIngr.nombreG,
+        idG: datosIngr.idG,
+        fechaG: Timestamp.fromDate(new Date(datosIngr.fechaG)),
+        descripcionG: datosIngr.descripcionG,
+        turnoG: datosIngr.turnoG
+      }) //Inicializamos las entradas...
       const traerD = async ()=>{
       const registrarD = await datosR()
       setDatosLocalS(registrarD)
       const idGen = docuRf.id
       setIdes(idGen) // guarda los ids que almacenamos
       setDatosIngr(datosIniciales)
-  }
-  traerD()
+      }
+      traerD()
+    } catch(e){
+      console.log("Error al registrar los datos: "+ e)
+    }
 };
 
-  const agregarDatos = (name:string,value:string | number)=>{ 
+  const agregarDatos = (name:string,value:string | number | Date)=>{ 
     setDatosIngr({...datosIngr, [name] : value})
   };
 
   const datosRecib =(d:string)=>{
+    try{
       const traerD = async ()=>{
       const registrarA = await datosR()
       const dFiltrados = registrarA.filter((a)=>a.id == d);
@@ -69,11 +80,13 @@ export default function Home() {
             turnoG: d.turnoG
         }
         setDatosA(datoACT)
-        console.log(datoACT+" este es el datosACT para actualizar")
       })
+      }
+      traerD()
+      setIda(d)  // es el id que recibimos
+    } catch (e){
+      console.log("Error al guardar los datos a Actualizar: "+ e)
     }
-    traerD()
-    setIda(d)  // es el id que recibimos
   };
 
   const datosAC = (name:string,value:string | number | Date)=>{ 
@@ -83,9 +96,10 @@ export default function Home() {
   };
 
   const actualizarDatos = ()=>{
-    const docRef = doc(db, 'Registros',iDA);
-    alert("la IDA es "+ iDA)
-    const act = async () => {
+    try {
+      const docRef = doc(db, 'Registros',iDA);
+      alert("la IDA es "+ iDA)
+      const act = async () => {
       await updateDoc(docRef, {
         nombreG: datosAct.nombreG,
         idG: datosAct.idG,
@@ -96,6 +110,9 @@ export default function Home() {
     }
     act()
     setIdes(iDA)
+    } catch (e) {
+      console.log("Error al aSctualizar los datos: "+ e)
+    }
   };
 
 
@@ -116,7 +133,7 @@ export default function Home() {
       /><br />
       <label>Fecha de ingreso : </label>
       <input type="date" name="fechaG"  
-      onChange = {(e) => {agregarDatos(e.target.name, e.target.value)}}
+      onChange = {(e) => {agregarDatos(e.target.name, (e.target.value + "T12:00:00"))}}
       /><br />
       <label>Descripción. </label><br />
       <textarea name="descripcionG" placeholder="Descripcion del trabajo.."
@@ -137,26 +154,24 @@ export default function Home() {
     </form>
     <MostrarDatos  datosP={datosRecib} setDatosLocalS={setDatosLocalS} idesAlm = {idds} />
 
-
     <form>
       <h1>ACTUALIZAR DATOS</h1>
       <label>Nombre : </label>
       <input 
       type="text" 
       name="nombreG" 
-      value={datosA.nombreG}
+      placeholder={datosA.nombreG}
       onChange = {(e) => {datosAC(e.target.name, e.target.value)}}/><br/>
       <label>ID : </label>
       <input 
       type="number" 
       name="idG" 
-      value={String(datosA.idG)}
+      placeholder={String(datosA.idG)}
       onChange = {(e) => {datosAC(e.target.name, e.target.value)}}/><br/>
       <label>Fecha : </label>
       <input 
       type="date" 
       name="fechaG" 
-      placeholder={datosIngr.fechaG.toISOString().substring(0, 10)}
       onChange = {(e) => {datosAC(e.target.name, e.target.value)}}/><br/>
       <label>Descripción : </label><br />
       <input 
